@@ -1,0 +1,460 @@
+API
+El termino API es una abreviatura de Aplication Programming Interfaces, que en español significa Interfaz de Programación de Aplicaciones.
+
+Interfaz 
+Dispositivo capaz de transformar las señales generadas por un aparato en señales compresibles por otro.
+Ejemplo de interfaz: Computadora, celular, televisor etc.
+
+Las APIS son una interfaz para que se comuniquen aplicaciones. Esta comunicación sucede a través de peticiones y respuestas.
+
+Tipos de APIS
+API abierta - las API abiertas tienen medidas de seguridad relajadas lo que permite a los desarrolladores y usuarios externos acceder a los datos facilmente.
+
+API privada - Las API internas se ocultan a terceros y se utilizan para mejorar la comunicación dentro de una organización.
+
+Arquitectura REST {REST:API}
+1.Cliente - Servidor: Debe haber una separacion de responsabilidad entre el cliente y el servidor.
+El cliente se encarga de la interaccion con el usuario mientras que el servidor(API) de gestionar y procesar datos.
+
+2.Es un protocolo sin estado, es decir no se guarda informacion en el servidor. Ej: no se guardan sesiones(logueos) de usuarios. Cada peticion que se envia a la API debe tener un token unico.
+
+3.Cacheable. Las respuestas de la API deben poder ser almacenadas en cache por el cliente.
+
+4.Interfaz uniforme: agrupa otros cuatro conceptos en los que se determina que los recursos deben ser identificados, la manipulacion de los recursos debe ser a través de la representacion, con mensajes autodescriptivos y utlizando enlaces para navegar por la aplicación.
+
+5.Sistema de capas: el servidor puede disponer de varias capas para su implementacion. Esto ayuda a mejorar la esclabilidad, el rendimiento y la seguridad.
+
+JSON
+La mayoria de las peticiones que hace el cliente con la API se hacen utilizando el formato JSON y las respuestas son en el mismo formato.
+
+¿Cuando se considera que es una APIRESTFul?
+Se considera que es una APIRESTFul cuando el protocolo por el cual se comunican el cliente y la API es el protocolo HTTP y ademas la API respete la arquitectura REST.
+
+Programas necesarios en nuestra computadora para trabajar con API's
+1.XAMPP
+2.Node.js
+3.Composer
+4.Visual Studio Code o cualquier otro editor de texto.
+5.Git
+6.MySQL Workbench (para maquetar bases de datos).
+7.Postman (para hacer peticiones de muestra a nuestra API) (token: postman://auth/callback?code=7ac6877acf4cbc23a22a8a64316f33bd683e099e784b3ec3b522a68152348497).
+
+1.Crear nuestro proyecto
+Usando el controlador de laravel: 
+1° Ubicarnos en la carpeta de nuestro servidor local(XAMPP/htdocs) y ejecutar: laravel new <nombre-proyecto>
+2° Crear dominio y virtual host local.
+
+End Point
+Los distintos programas que quieran interactuar con nuestra API lo haran a través del protocolo HTTP. Y nuestra API recibira estas peticiones a través de los End Points.
+Los End Point son cualquier punto que sea la parte final de una red y nosotros lo vamos a definir como rutas. Vamos a recibir todas las peticiones a través de las rutas que vamos a definir en el archivo 'routes/api.php' .
+La diferencia entre 'api.php' y 'web.php' renace en los middlewares que protegen a cada uno.
+La principal diferencia entre el middleware 'api' y el middleware 'web' es que este ultimo exige que en cualquier peticion de estilo 'POST', 'DELETE', 'PATCH' deben mandarse con un token csrf desde nuestra aplicacion o proyecto general. En cambio la finalidad de la API es que todos estos estilos de peticiones 'POST', 'DELETE', 'PATCH' deben ser mandados desde un programa diferente y no desde nuestra API. Y es por esa razón que el middleware 'api' no tiene la protección csrf.
+Otras de las diferencias entre los archivos 'api.php' y 'web.php' es que en 'api.php' se le suma un prefijo '$apiPrefix' (en el archivo 'ApplicationBuilder.php'). Sirve para identificar que el programa se trata de una api. Se los usa comunmente para diferenciar distintas versiones del programa(API) que estamos desarrollando.
+A medida que saquemos nuevas versiones de la API escribiremos estos cambios en un nuevo archivo 'api-v2.php', 'api-v3.php', etc.
+
+-Registro de Usuarios
+1.Creamos el controlador 'RegisterController': php artisan make:controller Api/RegisterController
+en este caso creamos en controlador dentro de una carpeta llamada 'Api/' ya que quiero separar los controladores para nuestra API de los controladores 'web' que tambien vamos a tener. ¿Y porque vamos a generar controladores web si dijimos que el cliente y la API deben estar separadas? Lo que sucede es que comunmente nosotros vamos a tener que documentar nuestra API y esta documentación se suele incorporar en nuestra propia API. Por ejemplo el usuario va a entrar a nuestra pagina 'api.codersfee.test' y alli deberiamos mostrar toda la información de esta.
+
+2.Creamos nuestro EndPoint que va a ser el encargado de recibir la peticion para agregar un nuevo registro a nuestra base de datos: 
+    1° Vamos a nuestro archivo de rutas 'api-v1.php' (recordemos que nuestras APIS no muestran vistas, solo reciben peticiones, realizan una accion y devuelven una respuesta) ya dentro del archivo generamos una ruta 'POST' llamada 'register' y exportamos el controlador RegisterController.
+    2° Creamos el metodo 'store' dentro del 'RegisterController'. Este metodo se encarga de crear el usuario y enviar una respuesta correcta al cliente.
+    3° Le damos un nombre a la ruta "->name('api.v1.register')".
+
+3.Creamos nuestra base de datos y realizamos la migración de nuestras tablas.   
+
+4.Probar nuestra API con postman
+    1° Creamos un nuevo espacio de trabajo(workspace) llamado api.codersfree.test
+    2° Creamos una nueva solicitud.
+    3° Las peticiones las enviamos a htttp://api.codersfree.test/v1/register (url de la solcitud) y debe ser de tipo POST(al igual que nuestro end point(ruta) que definimos)
+    4° Mandar la información del usuario(nombre, contraseña, etc) utilizando el "body" del objeto request, osea que viaje de manera oculta (ya que utilizamos un end point de tipo POST)
+    5° Ya en la opción "body" elegimos mandar la información con form-data. Llenamos los distintos campos que queremos mandar(name, email, password, etc) y la enviamos(send)
+
+Si enviamos dos veces una peticion con la misma información nuestra API no la guarda la segunda vez gracias a nuestras reglas de validación, gracias a esta nos redirecciona a api.codersfree.test .
+Nuestra API no nos deberia retornar redirecciones o codigo HTML. Para arreglar esto hacemos lo siguiente:
+    1° Vamos al archivo vendor/laravel/framework/src/foundation/exceptions/Handler.php
+    2° Buscamos el metodo render y desde alli al metodo 'convertValidationExceptionToResponse'.
+    3° Ya en este ultimo metodo cambiamos el invalid por invalidJson.
+
+5.Maquetar Base de datos
+
+1° Abrir workbench y crear un nuevo modelo.
+2° Crear las tablas a utilizar.(el campo 'slug' es para url amigables. Las url amigables nos sirven para un mejor posicionamiento SEO en google).
+
+*Generar relacion de muchos a muchos
+    1° Hacer una tabla intermedia con el nombre de ambas tablas y en singular, ejemplo: post_tag
+    2° Con esta nueva tabla crear una relacion de uno a muchos con ambas tablas en cuestión.
+
+3° Crear tabla 'image' que va a tener una relación polimorfica con distintas entidades(otras tablas)
+
+6.Crear el modelo fisico
+1°Crear los modelos y las migraciones necesarias: php artisan make model Category -m // -m para crear aparte del modelo tambien la migración
+
+*Para crear la tabla de muchos a muchos no se crea el modelo: php artisan make:migration create_post_tag_table
+
+7.Generar Relaciones
+1° Abrir todos los modelos y hacer las relaciones. Ejemplo: 
+
+    //relacion uno a muchos
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+8.Crear datos falsos(factories y seeders)
+1° Crear factories para cada modelo. Ejemplo: php artrisan make:factory CategoryFactory 
+
+Para el campo 'name' de category utilizamos: 
+$name = $this->faker->unique()->word(20); //palabra de 20 caracteres
+
+Y para el 'slug' (url amigable) usamos la clase str:
+use Illuminate\Support\Str;
+y luego el metodo slug:
+'slug' => str::slug($name),
+
+Cambiar donde queremos que se guarden las imagenes:
+config/fyleSistems.php 
+'default' => env('FILESYSTEM_DISK', 'public'), <-(asi debe quedar)
+Y en el archivo .env:
+FILESYSTEM_DISK=public
+Luego, para crear el acceso directo a la carpeta storage/app/public:
+php artisan Storage:link
+
+Luego de llenar todos los factories crear seeders para los factories que sean necesarios, Ejemplo:
+php artisan make:seeder UserSeeder
+Y en ese seeder creado dentro de la funcion 'run':
+
+        User::create([
+            'name' => 'Manuel Ayusa',
+            'email' => 'ayusaManuel@gmail.com',
+            'password' => bcrypt('12345678'),
+        ]);
+
+        User::factory(99)->create(); 
+
+y luego de eso, en DatabaseSeeder.php:
+$this->call(UserSeeder::class);
+Category::factory(4)->create();
+
+Al usar factories que creen imagenes y estas imagenes se guarden en una carpeta que aun no existe, hacer lo siguiente:
+    1° En DatabaseSeeder.php ejecutar: 
+        use Illuminate\Support\Facades\Storage;
+    2° En la funcion run antes de ejecutar todos los factories:
+        Storage::deleteDirectory('posts');
+        Storage::makeDirectory('posts');
+
+2° Ejecutar las migraciones y seeders.
+
+9.Generando endpoints para categorias
+
+1° Crear un controlador para categorias.
+php artisan make:controller Api/CategoryController --api // --api para para que se cree con los metodos necesarios para manipular los endpoints que vamos a generar en api.v1.php.
+Este controlador no se crea con los metodos 'create' y 'edit' ya que estos devuelven una vista y nuestra API no devuelve vistas sino que recibe peticiones y retorna repuestas.
+
+2° Generar todos los endpoints para Categorias (index, show, update, delete). Ejemplo: 
+Route::get('categories', [CategoryController::class, 'index'])->name('api.v1.categories.index');
+
+10.Recibir peticiones y generar respuestas para el recurso Category
+
+1° Generar la logica necesaria para cada uno de los metodos.
+
+El metodo index nos deberia devolver un archivo de tipo JSON con todos los registros de categorias que tengamos en nuestra base de datos.
+
+Siempre hay que devolver una información al cliente, incluso en los metodos store, update y delete.
+
+Para usar asignacion masiva ( Category::create($request->all()) ) se debe habilitar la misma en el modelo.
+
+2° Probar los endpoints y metodos del controlador con postman.
+Para probar el endpoint update no se puede usar form-data sino x-www-form-urlencoded
+
+QUERY SCOPES
+Un Query Scope nos permite modificar una consulta a la base de datos.
+
+11.Incluir relaciones de los recursos
+Mostrar los recursos(registros) con o sin las relaciones según la peticion del cliente.
+
+Añadiendo un query scope 
+1° En el metodo index agregar el metodo include():
+    $category = Category::include()->findOrFail($id);
+2° En el modelo Category agregar un nuevo metodo llamado scopeInclude(){}
+3° Dentro de este agregar la variable $relations y luego tambien agregar a la consulta el metodo with.
+4° Agregar una variable protected $allowIncluded donde estran las relaciones permitidas en este recurso.
+5° Iterar la variable $relations para verificar si el usuario pidio una relación permitida.
+
+para aladir una relacion en el query sacope inlude: http://api.codersfree.test/v1/posts?included=users,posts;
+
+12.Filtrar recursos
+Para filtrar recursos el cliente debera mandar una o mas variables de la forma filter[nombreFiltro]. Ejemplo:
+api.codersfree/v1/categories/filter[name]=hola
+
+1° Agregar el metodo include() y filter() en el metdo index(){} de CategoryController.
+2° Crear el metodo scopeFilter y la variable $allowFilter en el modelo Category.
+
+13.Ordenar recursos
+Para ordenar recursos el cliente debera mandar una variable en la peticion de nombre sort. Ejemplo:
+api.codersfree/v1/categories/sort=hola //en caso de una sola variable 
+api.codersfree/v1/categories/sort=hola,luna,etc //en caso de dos o mas variables 
+
+1° Agregar el metodo sort() en el metodo index(){} de CategoryController.
+2° Crear el metodo scopeSort y la variable $allowFilter en el modelo Category.
+
+14.Paginar Recursos
+Para paginar recursos el cliente debera mandar una variable en la peticion de nombre perPage. Ejemplo:
+api.codersfree/v1/categories/perPage=2 //paginados de dos en dos
+
+15.Crear clase de recursos
+Tener una capa de transformación entre nuestros modelos de eloquent y las respuestas JSON de nuestra API.
+Con capa de transformación nos referimos a la estructura en que se dan nuestras respuestas o el nombre de las variables dentro de estas.
+Laravel nos brinda recursos para llevar a cabo estas transformaciones:
+    php artisan make:resource CategoryResource
+Lo que va hacer este comando es crear un recurso en la carpeta app/Http/Resources
+
+Ahora en CategoryController, en los metodos que devuelvan un solo registro como respuesta: 'return $category;' por 'return CategoryResource::make($category);'
+
+Y en los metodos que devuelvas mas de un registro: 
+'return CategoryResource::collection($categories)'
+
+Y en CategoryResource:
+return parent::toArray($request);
+por 
+return [
+            'id' => $this->id,
+            'nombre' => $this->name,
+            'slug' => $this->slug,
+        ]; //aqui podemos reotrnar las variables que quieramos, cambiarles sus nombres etc.
+
+16. Ampliar la funcionalidad con los query scopes con traits de PHP
+Vamos a crear un trait con todas las fucnionalidades de los query scope para todos los modelos.(Es mas eficiente y para reutilizar codigo)
+
+17.Recibir peticiones y generar respuestas para el recurso Post
+Crear los end points y un controlador para que este pueda dar respuestas a las peticiones de los usuarios.
+1° Crear un controlador PostController: 
+    php artisan make:controller Api/PostController --api --model=Post
+2° Crear los end points en el archivo de rutas api.v1.php:
+    Route::apiResource('posts', PostController::class)->names('api.v1.posts'); 
+3° Copiar la logica de los metodos de CategoryController(van a ser muy parecidos)
+
+18.Instalar Laravel Passport
+Añadir el middleware 'auth:api' en PostController:
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(middleware: 'auth:api', except: ['index', 'show']),
+        ];
+    }
+
+La forma de loguearnos o autenticarnos en nuestra API's es a traves de Tokens. Nosotros vamos a tener que generar un token que identifique a un usuario y una vez que el cliente ha adquirido ese token, en todas las peticiones que haga tendra que mandar ese token en la solicitud.
+Para este proceso Laravel nos proporciona Laravel Passport.
+Instalar Laravel Passport:
+(suponiendo que el archivo php.ini(que se encuentra en XAMPP/PHP) ya ha sido modificado añadiendo: extension=sodium)
+    1° composer require laravel/passport
+    2° php artisan passport:install
+    3° agregar trait en modelo User
+
+Por seguridad usar Client UUIDs:
+    php artisan passport:install --uuids (para usar uuids se debe usar como base de datos mysql(con MariaDB no funciona))
+
+PASSWORD GRANT CLIENT
+19.Solicitar un acces token desde postman
+El middleware que protege a las rutas de los endpoint "posts" lo que hace es verificar que en las cabeceras(header en postman) de nuestras peticiones estemos enviando un token, luego utiliza ese token para autenticar un usuario, eso quiere decir que cada token representa solamente a un usuario. En el caso que el middleware verifique que en la cabecera(header) no hemos enviado ningun token lo que ocurre es generar un error 401 con el mensaje "Unahutenticated". 
+¿Como se genera ese token?
+Cada vez que el ciente quiere hacer una petición en nombre de un usuario lo que debe hacer es solicitar un token a nuestra API. Una vez que la API le devuelva ese token, el cliente debe almacenarlo en alguna parte y luego cada vez que realize una peticion mandar ese token en la cabecera.
+
+Tipos de clientes
+Existen varios tipos de cliente y dependiendo el cliente va a ser una manera distinta de solicitar ese token.
+El primer tipo de cliente que veremos es el cliente de tipo Password. Este cliente lo que hace es solicitar a los usuarios un usuario y una contraseña, luego manda ese usuario y contraseña a nuestra API y lo intercambia por un token y luego como ya mencionamos el cliente utilizara ese token en cada peticion que realice en nombre de un usuario.
+
+1° Crear un cliente de tipo Password:
+    php artisan passport:client --password
+    Luego de ejecutar el comando nos va a solicitar un nombre para el cliente. 
+    Y luego si queremos relacionarlo a algun usuario.
+    En este caso omitimos las dos preguntas(enter).
+
+2° Solicitar a la API un token de acceso(mandar las credenciales del cliente generado en el 1° paso).
+    Mandar a la ruta http://api.codersfree.test/v1/oauth/token
+    En el body se mandara el tipo de cliente(grant_type),las credenciales del cliente (client_id y client_secret), y el username(email) y password(contraseña) que el cliente le solicito al usuario(el username y contraseña debe estar en la bd de la API en la tabla user). Esto nos devolvera un bear, un acces token y un refresh token.
+
+3° Para mandar una peticion a nuestra API, nos dirijimos a la ruta http://api.codersfree.test/v1/posts en postman y en el header agregamos: Accept como clave y application/json como valor; Authorization como clave y como valor: Bear <access token> y en el body la información del post que queremos guardar. 
+Si el token pertenece a un usuario authenticado, que en este caso es asi, nos dejara guardar el post y nos devolvera su informacion(flujo normal del metodo store).
+Para saber quien es el usuario que realizo la peticion: return auth()->user();
+
+20.Instalar laravel breeze en el cliente
+Vamos a solicitar un token desde un proyecto adicional que va a ser el cliente desde el cual vamos a consumir nuestra API. Vamos a ver como solicitar un token desde este cliente, almacenarlo en la base de datos del mismo y luego utilizarlo para hacer peticiones en nombre de ese usuario.
+
+1° Crear un proyecto e instalarlo con el kit de inicio breeze
+2° php artisan breeze:install
+3° php artisan migrate
+4° npm install
+5° npm run dev
+6° Vamos a modificar los archivos AuthenticatedSessionController y RegistredUserController del nuevo proyecto(cliente). //incompleto no termina de explicar en el video y pasa al siguiente
+
+21.Crear endpoint para hacer login en API
+1° Crear un controllador que se va a encargar de procesar las peticiones de un determinado usuario: php artisan make:controller Api\Auth\LoginController
+2° Importamos el controlador recien creado a el archivo api-v1.php
+3° Creamos el endopint(ruta):
+Route::post('login', [LoginController::class, 'store']);
+4° Creamos el metodo 'store' en LoginController 
+
+22.Configurando el proyecto del cliente para hacer login
+Quiero que cuando el usuario introduzca un email y una contraseña(en el proyecto del cliente) no se verifique en la base de datos del cliente(si es que esta información existe) si no que quiero que se haga una peticion a nuestra API en el endpoint que creamos anteriormente y verificamos ahi que este usuario exista en la base de datos de la API. Si este usuario existe alli, almacenaremos cierta información en la base de datos del cliente, para ser exacto, el nombre y el email del usuario.
+
+1° Abrimos la migracion users en el proyecto del cliente.
+2° Borramos el campo email_verified y password
+3° Vamos al modelo user y eliminamos tambien el campo password.
+4° Creamos una migración que se encargue de crear una tabla para guardar un access token de un determinado usuario, para esto creamos un modelo que al mismo tiempo nos cree la migracion:
+php artisan make:model AccessToken -m
+5° Creamos ciertos campos en la migracion que se acaba de crear.
+6° Creamos una relacion entre la entidad user y la entidad access_token(migraciones y modelo). La relacion que deben tener es una relacion de uno a uno ya que un usuario deberia tener por cliente un unico access_token.
+
+23.Iniciar sesión desde el cliente 
+Vamos a modificar los archivos AuthenticatedSessionController y RegistredUserController de proyecto del cliente.
+
+1° en el archivo AuthenticatedSessionController en el metodo store modificamos el LoginRequest por Request, luego comentamos toda la logica del metodo store y arriba agregamos reglas de validacion para el email y password.
+2° En el mismo metodo(store) hacemos una peticion a nuestra API. Importamos el facade 'Http' que nos permite hacer esta peticion. Luego agregamos la peticion en el metodo.
+3° Hacemos login en el cliente para comprobar que nos devuelva la respuesta(la informacion del usuario)(probamos con un usuario registrado en la base de datos de la API);
+4° En el proyecto del cliente: php artisan config:cache (para que se muestre la información de forma correcta)
+4° Alamacenamos esa informacion en la bd del cliente: 
+    4.1° importamos el modelo user en AuthenticatedSessionController
+    4.2° Creamos un usuario o actualizamos un usuario.
+
+24.inicar sesión desde el cliente II
+1° Determinar logica si la respuesta a la peticion es un error 404.
+2° Luego de asegurarnos que el usuario existe en la bd de la API y crearlo o actualizarlo en el cliente, vamos a realizar otra petición a nuestra API. Esta peticion se encargara de solicitar un access token a la API.
+3° Luego de realizar la peticion debemos guardar el access token, refresh token y los otros datos que nos devolvio la respuesta de la API.
+
+25. Registrar usuario desde el cliente
+1° Mover el Api\RegisterController a la carpeta Auth\ (de la API)
+2° Modificar el user::create de dicho controlador
+
+26. Registrar usuario desde el cliente II
+En este capitulo vamos a trabajar modificando el archivo RegisteredUserController
+
+25. Proteger credenciales(client_id y client_secret)(ESTO EN EL PROYECTO DEL CLIENTE)
+1° Agregar las variables CLIENT_ID y CLIENT_SECRET a el archivo .env
+2° Agregar un servicio  al archivo config/service.php
+3° Actualizar las variables en los archivos donde se usan estas variables
+Agregar un servicio: 1° php artisan config:clear    
+                     2° php artisan config:cache
+
+26. Trait para solicitar un access token(reutilizar codigo para AuthenticatedSessionController y RegisteredUserController)
+
+27. Mandar access token en las peticiones
+En este capitulo lo que queremos hacer es que en cada solicitud que hagamos desde el cliente mandemos el access token del usuario autenticado para que de esa manera desde nuestra api sepamos quien es el que esta haciendo esa peticion. 
+
+1° En el proyecto del cliente creamos el controlador PostController.
+2° Creamos la ruta get controlada por el metodo store.
+3° Creamos el metodo store en PostController y hacemos una petición a la API desde el.
+
+Porque nosotros mandamos access token en cada peticion(desde el cliente) y no mandamos el email y contraseña para authenticarse desde nuestra API. Lo que sucede es que en cada peticion que el cliente esta haciendo no es en su propio proyecto sino que la esta mandando por internet hacia nuestra API y esa información que esta mandando puede ser capturada por piratas informaticos, lo cual es poco seguro. Es por eso que se mandan los token en cada petición y no el usuario y contraseña. Con los token este problema no es tan grave ya que tienen un tiempo de expiración.
+
+GRAN TYPE REFRESH TOKEN
+28. Solicitar nuevo token
+Darle tiempo de vida corto a nuestros tokens.
+1° En el archivo vendor/laravel/framework/auth/AuthServiceProvider de nuestra API vamos a agregar: 
+    public function boot()
+    {
+        Passport::tokensExpireIn(now()->addSeconds(60));
+    } 
+
+2° En el proyecto del cliente en PostController en el metodo store, pegamos la peticion del trait Token(Creado en capitulos anteriores) y le hacemos algunos cambios.
+
+3° Luego de esos cambios realizados, crear una nueva funcion llamada: public function resolveAuthorization()en el controlador padre app/Controllers/Controller.php y cortar y pegar esos cambios reailzados en PostController.
+
+29. Purgar tokens (borrar tokens expirados de la bd)
+1° En la API: php artisan passport:purge
+Se puede programar una tarea para que cada cierto tiempo se ejecute este comando:
+    Abrimos el archivo routes/console.php y agregamos la siguiente linea: Schedule::command('passport:purge')->everyMinute();
+
+28. Instalar laravel breeze en nuestra API 
+Vamos a ver como clientes externos van a poder publicar en nombre de un usuario o recuperar cierta cantidad de información. La manera en que lo van a hacer es muy parecida a la del cliente de tipo password. Primero tendria que solicitar un access token que identifique a un usuario y luego podria empezar a publicar. La forma de obtener el access token es diferente a como lo hacia un cliente de tipo password. 
+Lo que tiene que hacer este cliente externo es generar un link de redirección(por ejemplo inicar sesión con facebook o google). Esta redirección los mandara al frontend de nuestra API y aqui aparecera una vista que diga "si autorizo los permisos para este cliente" una vez que se autoriza, se vuelve a redireccionar pero esta vez al sitio del cliente. 
+Este tipo de cliente no puede solicitar usuario y contraseña sino que tienen que generar una autorizacion por medio de redireccionamiento. 
+Este cliente no va a poder acceder a nuestra consola para generar un client_id y un client_secret por lo que nosotros tenemos que generar una interfaz que le permita al cliente venir aqui y generar esas credenciales. 
+
+1° Generamos un sistema de logueo en nuestra API(breeze)
+
+La idea es que el cliente externo que quiera ser cliente de nuestra API debe ir a la documentación de nuestra API e iniciar sesión y ya logueado nosotros le debemos mostrar una opcion(CRUD) para crear un cliente. En nuestra API:
+
+1° Creamos una ruta get en web.php controlada por el controlador ClientController por el metodo index.
+2° Cremos un controlador llamado ClientController y lo importamos en web.php.
+3° Creamos el metodo index en ClientController, este metodo devolvera una vista.
+4° Creamos la vista con un formulario:
+    1° Crear un componente llamado 'container' para centrar el contenido dentro de el.
+
+38. Incluir vue y axios en nuestro proyecto
+En este capitulo vamos a agregar inputs a nuestro formulario para que el usuario que quiera registrar un nuevo cliente le de un nombre identificativo a ese cliente asi como una url de redirección que va a servir para redireccionar a la aplicación del cliente una vez que se completo el proceso de obtener el access token.
+
+AXIOS
+Axios es una librería  JavaScript que puede ejecutarse en el navegador y que nos permite hacer sencillas las operaciones como cliente HTTP
+
+1° En nuestra API agregamos los inputs nombre y url de redirección a index.php 
+
+Como vamos a crear un nuevo registro?(Cliente)
+Cuando instalamos el paquete passport viene con su propia api que nos va a facilitar la creación de clientes lo unico que tenemos que hacer es enviar la información de los inputs del 1° paso a la api de passport y esta se va a encargar de crear un nuevo cliente. Como vamos a mandar esta información? La vamos a mandar a traves de axios combinado con vue, es decir vamos a realizar esta peticion con vue y axios.
+Esto que estamos creando ahora que va a ser utilizado para ser enviado a la API de passport y crearnos un nuevo cliente, solo lo podemos hacer en la interfaz de la API, es decir no podriamos enviar esta información desde un cliente externo.
+
+2° Copiar el CDN de vue y de axios(axios nos va a permitir hacer peticiones de manera asincronica) en la plantilla app.blade.php
+
+3° Copiar CDN de sweetAlert2
+
+39. Registrar nuevos clientes 
+
+video 39 
+
+LOS CLIENTES DE TIPO PASSWORD POR SEGURIDAD SOLO SE PUEDEN CREAR DESDE LA TERMINAL.
+
+El tipo de cliente externo no puede solicitar un access token con el gran type password que solicitaba el email y contraseña al usuario, sino que obtendra el access token a traves el redireccionamiento.
+
+40. Mostrar listado de clientes 
+En este capitulo lo que quiero hacer es mostrar los clientes que hayan sido creados abajo del formulario que creamos.
+
+41. Mostrar mensajes de error
+Lo que haremos sera: que una vez que agreguemos un nuevo cliente este automaticamente aparezca en la lista sin necesidad de refrescar la pagina. 
+
+42. Traducir Laravel(video 42)
+
+43. Eliminar cliente
+En este capitulo vamos a habilitar el boton de eliminar cliente en la documentación de nuestra API. 
+
+Vamos a utilizar otra vez el plugins SweetAlert2
+
+44. Editar cliente I
+Solucionamos errores al mostrar error en el formulario de creación del cliente.
+
+Se hace todo lo referido al modal (componente, variables, funciones de vue y peticiones axios, abrir, cerrar, etc)
+
+Creamos un componente blade para mostrar un modal al hacer click en editar cliente.
+
+Pasos para abrir y cerrar modal de manera dinamica.
+
+45. Editar cliente II
+Quiero que cuando demos click en editar se muestre en los inputs del modal la informacion de ese cliente(nombre y url de redirección)
+Antes de esto vamos a habilitar el botón de cancelar(modal)
+
+46.Credenciales del cliente 
+Quiero que al lado de "editar" cliente y "eliminar", aparezca un boton de "ver" que muestre las credenciales del cliente seleccionado, ´para ser exacto se debe mostrar el client_id y el client_secret.
+
+47. Crear nuevo proyecto para un cliente externo
+Creamos un nuevo proyecto en laravel llamado "cliente2" : laravel new cliente2
+Agregar un servicio al nuevo proyecto (cliente2) en config/services.php :
+'codersfree' => [
+        'client_id' => env('CODERSFREE_CLENT_ID'),
+        'client_secret' => env('CODERSFREE_CLENT_SECRET'),
+    ],
+Agregamos las varibles al archivo .env y al archivo .env.example.
+
+¿Porque un usuario puede tener varios clientes(externos)? 
+Porque ese usuario puede tener varios sitios web o aplicaciones de los cuales se quiera conectar a nuestra api y se crea un cliente para cada una de estas aplicaciones.
+
+Copiar las credenciales de un cliente ya creado en nuestra api en el archivo .env y luego cacheamos nuestra aplicación:
+php artisan config:cache
+
+48. Instalar laravel breeze en el cliente 2
+En este capitulo vamos a ver como podemos solicitar un access token para un usuario desde el cliente externo.
+
+Registramos un usuario en el proyecto de cliente2.
+
+La idea es que podamos publicar un post desde este cliente externo(cliente2) y para esto necesitamos autenticarnos en nuestra api de alguna manera.
+Lo que deberiamos hacer es lo siguiente: en la vista que muestra el sitio cliente2 luego de loguearnos, deberiamos poner un link de redirección que nos redirija hacia nuestra api y desde ahi mostrar una panatalla de autorización que noes diga por ejemplo: "usted autoriza a dar cierta credenciales a este cliente" y solo si el cliente acepta, volver a dirijir a la aplicacion del cliente y solicitar un access token.
+
+Quiero que cuando haga click a al boton redirigir le redireccione a una url llamada "redirect". Para esto vamos a nuestro archivo web.php (todo en el proyecto del cliente2) y definimos una ruta GET llamada redirect.
