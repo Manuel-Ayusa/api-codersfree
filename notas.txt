@@ -432,21 +432,31 @@ Quiero que cuando demos click en editar se muestre en los inputs del modal la in
 Antes de esto vamos a habilitar el botón de cancelar(modal)
 
 46.Credenciales del cliente 
-Quiero que al lado de "editar" cliente y "eliminar", aparezca un boton de "ver" que muestre las credenciales del cliente seleccionado, ´para ser exacto se debe mostrar el client_id y el client_secret.
+Quiero que al lado de "editar" cliente y "eliminar", aparezca un boton de "ver" que muestre las credenciales del cliente seleccionado, para ser exacto se debe mostrar el client_id y el client_secret.
 
 47. Crear nuevo proyecto para un cliente externo
 Creamos un nuevo proyecto en laravel llamado "cliente2" : laravel new cliente2
 Agregar un servicio al nuevo proyecto (cliente2) en config/services.php :
+
 'codersfree' => [
         'client_id' => env('CODERSFREE_CLENT_ID'),
         'client_secret' => env('CODERSFREE_CLENT_SECRET'),
     ],
+
+(   Agregamos el servicio para proteger las credenciales del cliente
+    25. Proteger credenciales(client_id y client_secret)(ESTO EN EL PROYECTO DEL CLIENTE)
+1° Agregar las variables CLIENT_ID y CLIENT_SECRET a el archivo .env
+2° Agregar un servicio  al archivo config/service.php
+3° Actualizar las variables en los archivos donde se usan estas variables
+Agregar un servicio: 1° php artisan config:clear    
+                     2° php artisan config:cache)
+
 Agregamos las varibles al archivo .env y al archivo .env.example.
 
 ¿Porque un usuario puede tener varios clientes(externos)? 
 Porque ese usuario puede tener varios sitios web o aplicaciones de los cuales se quiera conectar a nuestra api y se crea un cliente para cada una de estas aplicaciones.
 
-Copiar las credenciales de un cliente ya creado en nuestra api en el archivo .env y luego cacheamos nuestra aplicación:
+Copiar las credenciales de un cliente ya creado en nuestra API en el archivo .env y luego cacheamos nuestra aplicación:
 php artisan config:cache
 
 48. Instalar laravel breeze en el cliente 2
@@ -455,6 +465,8 @@ En este capitulo vamos a ver como podemos solicitar un access token para un usua
 Registramos un usuario en el proyecto de cliente2.
 
 La idea es que podamos publicar un post desde este cliente externo(cliente2) y para esto necesitamos autenticarnos en nuestra api de alguna manera.
-Lo que deberiamos hacer es lo siguiente: en la vista que muestra el sitio cliente2 luego de loguearnos, deberiamos poner un link de redirección que nos redirija hacia nuestra api y desde ahi mostrar una panatalla de autorización que noes diga por ejemplo: "usted autoriza a dar cierta credenciales a este cliente" y solo si el cliente acepta, volver a dirijir a la aplicacion del cliente y solicitar un access token.
+Lo que deberiamos hacer es lo siguiente: en la vista que muestra el sitio cliente2 luego de loguearnos, deberiamos poner un link de redirección que nos redirija hacia nuestra api y desde ahi mostrar una pantalla de autorización que nos diga por ejemplo: "usted autoriza a dar cierta credenciales a este cliente" y solo si el usuario acepta, volver a dirijir a la aplicacion del cliente y solicitar un access token.
 
-Quiero que cuando haga click a al boton redirigir le redireccione a una url llamada "redirect". Para esto vamos a nuestro archivo web.php (todo en el proyecto del cliente2) y definimos una ruta GET llamada redirect.
+Quiero que cuando haga click al boton redirigir le redireccione a una url llamada "redirect". Para esto vamos a nuestro archivo web.php (todo en el proyecto del cliente2) y definimos una ruta GET llamada redirect.
+
+Lo que tenemos que hacer desde la ruta redirect es redirigir hacia nuestra API. No lo redirijimos desde el enalce directamente ya que debemos enviar tambien algunos parametros.
