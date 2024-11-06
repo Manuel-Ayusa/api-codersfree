@@ -184,7 +184,7 @@
                 data() {
 
                     return {
-                        showClient: [],
+                        showClient: [], //para mostrar información en la vista se usa el array vacio
                         createForm:{
                             open: false,
                             name: null,
