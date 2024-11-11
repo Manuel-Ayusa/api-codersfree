@@ -75,7 +75,7 @@
                                 <td class="flex divide-x divide-gray-300 py-2">
 
                                     <a class="pr-2 hover:text-green-600 font-semibold cursor-pointer"
-                                    v-on:click="">
+                                    v-on:click="show(token)">
                                         Ver
                                     </a>
                                     <a class="pl-2 hover:text-red-600 font-semibold cursor-pointer"
@@ -91,6 +91,30 @@
             </x-form-section>
 
         </x-container>
+
+        {{-- Modal show --}}
+
+        <x-dialog-modal modal="showToken.open">
+            <x-slot name="title">
+                Mostrar Access Token
+            </x-slot>
+    
+            <x-slot name="content">
+                <div class="space-y-6 overflow-auto">
+
+                    <p>
+                        <span class="font-semibold">Access Token: </span>
+                        <span v-text="showToken.id"></span>
+                    </p>
+                
+                </div>
+            </x-slot>
+    
+            <x-slot name="footer">
+                <button v-on:click="showToken.open = false"
+                type="button" class="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto disabled:opacity-50 disabled:hover:bg-red-600">Cancelar</button>
+            </x-slot>
+        </x-dialog-modal>
 
     </div>
 
@@ -110,6 +134,10 @@
                             errors: []
                         },
                         tokens: [],
+                        showToken:{
+                            open: false,
+                            id: '',
+                        }
                     }
                 },
 
@@ -138,6 +166,11 @@
                         .then(response => {
                             this.tokens = response.data;
                         })
+                    },
+
+                    show: function (token) {
+                        this.showToken.open = true;
+                        this.showToken.id = token.id;
                     },
 
                     revoke: function (token) {
