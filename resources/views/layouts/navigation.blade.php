@@ -43,6 +43,9 @@
                             Clientes
                         </x-dropdown-link>
 
+                        <x-dropdown-link :href="route('tokens.index')">
+                            Api tokens
+                        </x-dropdown-link>
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">

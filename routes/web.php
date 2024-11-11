@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\TokenController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,3 +22,5 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 
 Route::get('client' , [ClientController::class ,  'index'])->name('client.index');
+
+Route::get('api-tokens', [TokenController::class, 'index'])->name('tokens.index');
