@@ -34,10 +34,22 @@
                             </ul>
                         </div>
 
-                        <label for="name">
-                            Nombre
-                        </label>
-                        <input v-model="form.name" type="text" class="w-full mt-1" id="name">
+                        <div>
+                            <label for="name">
+                                Nombre
+                            </label>
+                            <input v-model="form.name" type="text" class="w-full mt-1" id="name">
+                        </div>
+
+                        <div v-if="scopes.length > 0">
+                            <label>Scopes</label>
+                            <div v-for="scope scopes">
+                                <label for="">
+                                    <input type="checkbox" name="scopes" :value="scope.id" v-model="form.scopes">
+                                    @{{ scope.id }}
+                                </label>
+                            </div>
+                        </div>
                         
                     </div>
                 </div>
@@ -131,18 +143,21 @@
                     return {
                         form:{
                             name: null,
-                            errors: []
+                            errors: [],
+                            scopes: [],
                         },
                         tokens: [],
                         showToken:{
                             open: false,
                             id: '',
-                        }
+                        },
+                        scopes: [],
                     }
                 },
 
                 mounted() {
                     this.getTokens();
+                    this.getScopes();
                 },
 
                 methods:{
@@ -198,6 +213,13 @@
                                 });
                             }
                             });
+                    },
+
+                    getScopes: function () {
+                        axios.get('/oauth/scopes')
+                        .then(response => {
+                            this.scopes = response.data;
+                        })
                     }
                 }
             }).mount('#app')

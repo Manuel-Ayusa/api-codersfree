@@ -31,6 +31,6 @@ class AppServiceProvider extends ServiceProvider
 
         Passport::setDefaultScope([
             'read-post',
-        ])
+        ]);
     }
 }
