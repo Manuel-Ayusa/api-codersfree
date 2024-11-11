@@ -1,3 +1,11 @@
+# Blog API
+Esta es una API RESTful construida con Laravel y Laravel Passport para la gestión de blogs. Permite a los usuarios crear, leer, actualizar y eliminar publicaciones de blogs. La API soporta dos tipos de autenticación:
+
+- Clientes internos: Autenticación basada en password grant.
+- Clientes externos: Autenticación con url de redireccionamiento.
+
+
+
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
 <p align="center">

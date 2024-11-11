@@ -17,9 +17,7 @@
 
             @isset($actions)
                 <div class="px-6 py-3 bg-gray-100 shadow flex justify-end items-center sm:rounded-bl-md sm:rounded-br-md">
-                
                     {{$actions}}
-                    
                 </div>    
             @endisset
             

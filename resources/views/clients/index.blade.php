@@ -119,7 +119,7 @@
                     </ul>
                 </div>
 
-                <div class="">
+                <div>
 
                     <label for="name">Nombre</label>
                     <input v-model="editForm.name" type="text" class="w-full mt-1" id="name">
