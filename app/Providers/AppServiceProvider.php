@@ -28,5 +28,9 @@ class AppServiceProvider extends ServiceProvider
             'update-post' => 'Actualizar un post', 
             'delete-post' => 'Eliminar un post'
         ]);
+
+        Passport::setDefaultScope([
+            'read-post',
+        ])
     }
 }
