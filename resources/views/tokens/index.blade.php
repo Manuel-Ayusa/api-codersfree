@@ -83,7 +83,7 @@
                                         Editar
                                     </a>
                                     <a class="pl-2 hover:text-red-600 font-semibold cursor-pointer"
-                                    v-on:click="">
+                                    v-on:click="revoke(token)">
                                         Eliminar
                                     </a>
                                 </td>
@@ -127,6 +127,8 @@
                             .then(response => {
                                 this.form.name = null;
                                 this.form.errors = [];
+
+                                this.getTokens();
                             })
                             .catch(error => {
 
@@ -140,6 +142,33 @@
                         .then(response => {
                             this.tokens = response.data;
                         })
+                    },
+
+                    revoke: function (token) {
+                        Swal.fire({
+                            title: "Are you sure?",
+                            text: "You won't be able to revert this!",
+                            icon: "warning",
+                            showCancelButton: true,
+                            confirmButtonColor: "#3085d6",
+                            cancelButtonColor: "#d33",
+                            confirmButtonText: "Yes, delete it!"
+                            }).then((result) => {
+                            if (result.isConfirmed) {
+
+                                axios.delete('/oauth/personal-access-tokens/' + token.id)
+
+                                .then(response => {
+                                    this.getTokens();  
+                                })
+
+                                Swal.fire({
+                                title: "Deleted!",
+                                text: "Your file has been deleted.",
+                                icon: "success"
+                                });
+                            }
+                            });
                     }
                 }
             }).mount('#app')
