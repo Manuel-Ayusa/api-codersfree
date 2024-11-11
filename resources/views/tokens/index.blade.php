@@ -10,6 +10,7 @@
 
         <x-container class="py-8">
 
+            {{-- Crear access token --}}
             <x-form-section class="mb-12">
                 <x-slot name="title">
                     Access Token
@@ -48,6 +49,51 @@
                 </x-slot>
             </x-form-section>
 
+            {{-- Mostrar access tokens --}}
+            <x-form-section v-if="tokens.length > 0">
+                <x-slot name="title">
+                    Lista de Access Tokens
+                </x-slot>
+                <x-slot name="description">
+                    Aqui podras encontrar la lista de Access Tokens creados
+                </x-slot>
+                
+                <div >
+                    <table class="text-gray-600">
+                        <thead class="border-b border-gray-300">
+                            <tr class="text-left">
+                                <th class="py-2 w-full">Nombre</th>
+                                <th class="py-2">Acción</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-300">
+                            <tr v-for="token in tokens">
+                                <td class="py-2">
+                                    @{{ token.name }}
+                                </td>
+                                <td class="flex divide-x divide-gray-300 py-2">
+
+                                    <a class="pr-2 hover:text-green-600 font-semibold cursor-pointer"
+                                    v-on:click="">
+                                        Ver
+                                    </a>
+                                    <a class="px-2 hover:text-blue-600 font-semibold cursor-pointer"
+                                    v-on:click="">
+                                        Editar
+                                    </a>
+                                    <a class="pl-2 hover:text-red-600 font-semibold cursor-pointer"
+                                    v-on:click="">
+                                        Eliminar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+        
+            </x-form-section>
+
         </x-container>
 
     </div>
@@ -66,8 +112,13 @@
                         form:{
                             name: null,
                             errors: []
-                        }
+                        },
+                        tokens: [],
                     }
+                },
+
+                mounted() {
+                    this.getTokens();
                 },
 
                 methods:{
@@ -82,6 +133,13 @@
                                 this.form.errors = Object.values(error.response.data.errors).flat();
 
                             })
+                    },
+
+                    getTokens: function () {
+                        axios.get('/oauth/personal-access-tokens')
+                        .then(response => {
+                            this.tokens = response.data;
+                        })
                     }
                 }
             }).mount('#app')
