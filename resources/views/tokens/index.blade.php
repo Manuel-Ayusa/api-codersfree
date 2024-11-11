@@ -78,10 +78,6 @@
                                     v-on:click="">
                                         Ver
                                     </a>
-                                    <a class="px-2 hover:text-blue-600 font-semibold cursor-pointer"
-                                    v-on:click="">
-                                        Editar
-                                    </a>
                                     <a class="pl-2 hover:text-red-600 font-semibold cursor-pointer"
                                     v-on:click="revoke(token)">
                                         Eliminar
