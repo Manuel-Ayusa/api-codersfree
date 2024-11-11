@@ -21,5 +21,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Passport::enablePasswordGrant();
+
+        Passport::tokensCan([
+            'create-post' => 'Crear un nuevo post', 
+            'read-post' => 'Leer un post', 
+            'update-post' => 'Actualizar un post', 
+            'delete-post' => 'Eliminar un post'
+        ]);
     }
 }

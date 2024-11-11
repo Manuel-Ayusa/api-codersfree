@@ -15,6 +15,10 @@ class PostController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(middleware: 'auth:api', except: ['index', 'show']),
+            new Middleware(middleware: 'scopes:read-post', only: ['index', 'show']),
+            new Middleware(middleware: 'scopes:create-post', only: ['store']),
+            new Middleware(middleware: 'scopes:update-post', only: ['update']),
+            new Middleware(middleware: 'scopes:delete-post', only: ['destroy']),
         ];
     }
 
