@@ -10,7 +10,8 @@
         "laravel/passport": "12.3.0",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
-        "laraveles/spanish": "^1.5"
+        "laraveles/spanish": "^1.5",
+        "spatie/laravel-permission": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
