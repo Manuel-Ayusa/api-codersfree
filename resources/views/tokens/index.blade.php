@@ -11,6 +11,7 @@
         <x-container class="py-8">
 
             {{-- Crear access token --}}
+
             <x-form-section class="mb-12">
                 <x-slot name="title">
                     Access Token
@@ -42,26 +43,29 @@
                         </div>
 
                         <div v-if="scopes.length > 0">
+
                             <label>Scopes</label>
-                            <div v-for="scope scopes">
-                                <label for="">
+                            <div v-for="scope in scopes">
+                                <label>
                                     <input type="checkbox" name="scopes" :value="scope.id" v-model="form.scopes">
                                     @{{ scope.id }}
                                 </label>
                             </div>
+
                         </div>
                         
                     </div>
                 </div>
 
                 <x-slot name="actions">
-                    <x-primary-button v-on:click="store">
+                    <x-primary-button v-on:click="store()">
                         Crear
                     </x-primary-button>
                 </x-slot>
             </x-form-section>
 
             {{-- Mostrar access tokens --}}
+
             <x-form-section v-if="tokens.length > 0">
                 <x-slot name="title">
                     Lista de Access Tokens
@@ -106,7 +110,7 @@
 
         {{-- Modal show --}}
 
-        <x-dialog-modal modal="showToken.open">
+        <x-dialog-modal modal="showToken.open"> {{-- el modal se abre cuando showToken.open sea igual a true --}}
             <x-slot name="title">
                 Mostrar Access Token
             </x-slot>
@@ -166,6 +170,7 @@
                             .then(response => {
                                 this.form.name = null;
                                 this.form.errors = [];
+                                this.form.scopes = [];
 
                                 this.getTokens();
                             })
